@@ -7,111 +7,174 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f9f9f9;
       padding: 20px;
       text-align: center;
     }
     h1 {
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
     .bracket {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      max-width: 1300px;
-      margin: auto;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      overflow-x: auto;
     }
     .round {
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .matchup {
-      margin-bottom: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      min-width: 180px;
+    }
+    .matchup strong {
+      display: block;
+      margin-bottom: 6px;
     }
     .matchup button {
       display: block;
       width: 100%;
-      margin-top: 5px;
-      padding: 8px;
-      background: #e0e0e0;
+      margin: 5px 0;
+      padding: 6px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
+      background: #eee;
       cursor: pointer;
     }
     .matchup button.selected {
-      background-color: #4caf50;
+      background: #4caf50;
       color: white;
     }
   </style>
 </head>
 <body>
   <h1>NBA 2025 Playoff Bracket Picker</h1>
-  <div class="bracket">
-    <div class="round" id="playin">
-      <h3>Play-In</h3>
-      <div class="matchup"><strong>Warriors vs Grizzlies</strong><br>
-        <button onclick="pick(this)">Warriors</button>
-        <button onclick="pick(this)">Grizzlies</button>
-      </div>
-      <div class="matchup"><strong>Kings vs Mavericks</strong><br>
-        <button onclick="pick(this)">Kings</button>
-        <button onclick="pick(this)">Mavericks</button>
-      </div>
-      <div class="matchup"><strong>Magic vs Hawks</strong><br>
-        <button onclick="pick(this)">Magic</button>
-        <button onclick="pick(this)">Hawks</button>
-      </div>
-      <div class="matchup"><strong>Bulls vs Heat</strong><br>
-        <button onclick="pick(this)">Bulls</button>
-        <button onclick="pick(this)">Heat</button>
-      </div>
-    </div>
-    <div class="round" id="first">
-      <h3>First Round</h3>
-      <div class="matchup"><strong>Thunder vs TBD</strong><br></div>
-      <div class="matchup"><strong>Nuggets vs Clippers</strong><br>
-        <button onclick="pick(this)">Nuggets</button>
-        <button onclick="pick(this)">Clippers</button>
-      </div>
-      <div class="matchup"><strong>Lakers vs Timberwolves</strong><br>
-        <button onclick="pick(this)">Lakers</button>
-        <button onclick="pick(this)">Timberwolves</button>
-      </div>
-      <div class="matchup"><strong>Rockets vs TBD</strong><br></div>
-      <div class="matchup"><strong>Cavaliers vs TBD</strong><br></div>
-      <div class="matchup"><strong>Pacers vs Bucks</strong><br>
-        <button onclick="pick(this)">Pacers</button>
-        <button onclick="pick(this)">Bucks</button>
-      </div>
-      <div class="matchup"><strong>Knicks vs Pistons</strong><br>
-        <button onclick="pick(this)">Knicks</button>
-        <button onclick="pick(this)">Pistons</button>
-      </div>
-      <div class="matchup"><strong>Celtics vs TBD</strong><br></div>
-    </div>
-    <div class="round" id="semis">
-      <h3>Semifinals</h3>
-      <div class="matchup"></div>
-      <div class="matchup"></div>
-      <div class="matchup"></div>
-      <div class="matchup"></div>
-    </div>
-    <div class="round" id="finals">
-      <h3>Conference Finals & NBA Finals</h3>
-      <div class="matchup"></div>
-      <div class="matchup"></div>
-      <div class="matchup"></div>
-    </div>
-  </div>
+  <div class="bracket" id="bracket"></div>
 
   <script>
-    function pick(button) {
-      const group = button.parentElement;
-      group.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
-      button.classList.add('selected');
+    const bracket = document.getElementById('bracket');
+
+    const rounds = [
+      {
+        title: 'Play-In',
+        matchups: [
+          ['Warriors', 'Grizzlies'],
+          ['Kings', 'Mavericks'],
+          ['Magic', 'Hawks'],
+          ['Bulls', 'Heat']
+        ]
+      },
+      {
+        title: 'First Round',
+        matchups: [
+          ['Thunder', 'TBD'],
+          ['Nuggets', 'Clippers'],
+          ['Lakers', 'Timberwolves'],
+          ['Rockets', 'TBD'],
+          ['Cavaliers', 'TBD'],
+          ['Pacers', 'Bucks'],
+          ['Knicks', 'Pistons'],
+          ['Celtics', 'TBD']
+        ]
+      },
+      {
+        title: 'Semifinals',
+        matchups: [
+          ['', ''], ['', ''], ['', ''], ['', '']
+        ]
+      },
+      {
+        title: 'Conference Finals',
+        matchups: [
+          ['', ''], ['', '']
+        ]
+      },
+      {
+        title: 'NBA Finals',
+        matchups: [
+          ['', '']
+        ]
+      }
+    ];
+
+    const winners = {};
+
+    function createBracket() {
+      bracket.innerHTML = '';
+
+      rounds.forEach((round, rIdx) => {
+        const col = document.createElement('div');
+        col.className = 'round';
+
+        const header = document.createElement('h3');
+        header.textContent = round.title;
+        col.appendChild(header);
+
+        round.matchups.forEach((teams, mIdx) => {
+          const match = document.createElement('div');
+          match.className = 'matchup';
+
+          const label = document.createElement('strong');
+          label.textContent = teams[0] + ' vs ' + teams[1];
+          match.appendChild(label);
+
+          teams.forEach((team, tIdx) => {
+            const btn = document.createElement('button');
+            btn.textContent = team;
+            btn.onclick = () => {
+              const all = match.querySelectorAll('button');
+              all.forEach(b => b.classList.remove('selected'));
+              btn.classList.add('selected');
+              winners[`r${rIdx}m${mIdx}`] = btn.textContent;
+              updateNextRounds();
+            };
+            match.appendChild(btn);
+          });
+
+          col.appendChild(match);
+        });
+
+        bracket.appendChild(col);
+      });
     }
+
+    function updateNextRounds() {
+      // Fill Semis
+      for (let i = 0; i < 4; i++) {
+        const a = winners[`r1m${i*2}`];
+        const b = winners[`r1m${i*2+1}`];
+        if (a && b) rounds[2].matchups[i] = [a, b];
+      }
+      // Fill Conf Finals
+      for (let i = 0; i < 2; i++) {
+        const a = winners[`r2m${i*2}`];
+        const b = winners[`r2m${i*2+1}`];
+        if (a && b) rounds[3].matchups[i] = [a, b];
+      }
+      // Fill NBA Finals
+      const a = winners[`r3m0`];
+      const b = winners[`r3m1`];
+      if (a && b) rounds[4].matchups[0] = [a, b];
+
+      createBracket();
+      // Reapply selections
+      Object.keys(winners).forEach(k => {
+        const match = document.querySelector(`.round:nth-child(${parseInt(k[1])+1}) .matchup:nth-child(${parseInt(k[3])+2})`);
+        if (match) {
+          const btns = match.querySelectorAll('button');
+          btns.forEach(btn => {
+            if (btn.textContent === winners[k]) btn.classList.add('selected');
+          });
+        }
+      });
+    }
+
+    createBracket();
   </script>
 </body>
 </html>
