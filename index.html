@@ -7,43 +7,41 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
+      background: #f5f5f5;
       padding: 20px;
+      text-align: center;
     }
     h1 {
-      text-align: center;
+      margin-bottom: 40px;
     }
     .bracket {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      max-width: 1200px;
+      max-width: 1300px;
       margin: auto;
     }
     .round {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .matchup {
       background: #fff;
       padding: 10px;
-      border: 1px solid #ccc;
       border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .matchup {
+      margin-bottom: 20px;
     }
     .matchup button {
       display: block;
       width: 100%;
       margin-top: 5px;
-      padding: 5px;
-      background: #eee;
+      padding: 8px;
+      background: #e0e0e0;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     .matchup button.selected {
-      background: #4caf50;
+      background-color: #4caf50;
       color: white;
     }
   </style>
@@ -51,72 +49,68 @@
 <body>
   <h1>NBA 2025 Playoff Bracket Picker</h1>
   <div class="bracket">
-    <div class="round" id="round1">
-      <h3>First Round</h3>
-      <div class="matchup" data-match="1">
-        <strong>Thunder vs Kings</strong>
-        <button onclick="pick(this)">Thunder</button>
-        <button onclick="pick(this)">Kings</button>
+    <div class="round" id="playin">
+      <h3>Play-In</h3>
+      <div class="matchup"><strong>Warriors vs Grizzlies</strong><br>
+        <button onclick="pick(this)">Warriors</button>
+        <button onclick="pick(this)">Grizzlies</button>
       </div>
-      <div class="matchup" data-match="2">
-        <strong>Nuggets vs Clippers</strong>
+      <div class="matchup"><strong>Kings vs Mavericks</strong><br>
+        <button onclick="pick(this)">Kings</button>
+        <button onclick="pick(this)">Mavericks</button>
+      </div>
+      <div class="matchup"><strong>Magic vs Hawks</strong><br>
+        <button onclick="pick(this)">Magic</button>
+        <button onclick="pick(this)">Hawks</button>
+      </div>
+      <div class="matchup"><strong>Bulls vs Heat</strong><br>
+        <button onclick="pick(this)">Bulls</button>
+        <button onclick="pick(this)">Heat</button>
+      </div>
+    </div>
+    <div class="round" id="first">
+      <h3>First Round</h3>
+      <div class="matchup"><strong>Thunder vs TBD</strong><br></div>
+      <div class="matchup"><strong>Nuggets vs Clippers</strong><br>
         <button onclick="pick(this)">Nuggets</button>
         <button onclick="pick(this)">Clippers</button>
       </div>
-      <!-- Add more matchups here -->
+      <div class="matchup"><strong>Lakers vs Timberwolves</strong><br>
+        <button onclick="pick(this)">Lakers</button>
+        <button onclick="pick(this)">Timberwolves</button>
+      </div>
+      <div class="matchup"><strong>Rockets vs TBD</strong><br></div>
+      <div class="matchup"><strong>Cavaliers vs TBD</strong><br></div>
+      <div class="matchup"><strong>Pacers vs Bucks</strong><br>
+        <button onclick="pick(this)">Pacers</button>
+        <button onclick="pick(this)">Bucks</button>
+      </div>
+      <div class="matchup"><strong>Knicks vs Pistons</strong><br>
+        <button onclick="pick(this)">Knicks</button>
+        <button onclick="pick(this)">Pistons</button>
+      </div>
+      <div class="matchup"><strong>Celtics vs TBD</strong><br></div>
     </div>
-    <div class="round" id="round2">
+    <div class="round" id="semis">
       <h3>Semifinals</h3>
-      <div class="matchup" data-match="3"></div>
-      <div class="matchup" data-match="4"></div>
+      <div class="matchup"></div>
+      <div class="matchup"></div>
+      <div class="matchup"></div>
+      <div class="matchup"></div>
     </div>
-    <div class="round" id="round3">
-      <h3>Conference Finals</h3>
-      <div class="matchup" data-match="5"></div>
-    </div>
-    <div class="round" id="round4">
-      <h3>NBA Finals</h3>
-      <div class="matchup" data-match="6"></div>
+    <div class="round" id="finals">
+      <h3>Conference Finals & NBA Finals</h3>
+      <div class="matchup"></div>
+      <div class="matchup"></div>
+      <div class="matchup"></div>
     </div>
   </div>
 
   <script>
     function pick(button) {
-      const container = button.parentElement;
-      container.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+      const group = button.parentElement;
+      group.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
       button.classList.add('selected');
-      updateNextRounds();
-    }
-
-    function updateNextRounds() {
-      const r1 = document.querySelectorAll('#round1 .matchup');
-      const r2 = document.querySelectorAll('#round2 .matchup');
-      const r3 = document.querySelectorAll('#round3 .matchup');
-      const r4 = document.querySelectorAll('#round4 .matchup');
-
-      // Example logic (can expand based on actual seeds and matchups)
-      const winner1 = r1[0].querySelector('button.selected');
-      const winner2 = r1[1].querySelector('button.selected');
-
-      if (winner1 && winner2) {
-        r2[0].innerHTML = `<strong>${winner1.textContent} vs ${winner2.textContent}</strong>
-          <button onclick="pick(this)">${winner1.textContent}</button>
-          <button onclick="pick(this)">${winner2.textContent}</button>`;
-      }
-
-      const winner3 = r2[0].querySelector('button.selected');
-      const winner4 = r2[1]?.querySelector('button.selected');
-      if (winner3 && winner4) {
-        r3[0].innerHTML = `<strong>${winner3.textContent} vs ${winner4.textContent}</strong>
-          <button onclick="pick(this)">${winner3.textContent}</button>
-          <button onclick="pick(this)">${winner4.textContent}</button>`;
-      }
-
-      const winner5 = r3[0].querySelector('button.selected');
-      if (winner5) {
-        r4[0].innerHTML = `<strong>NBA Champion:</strong>
-          <button class="selected">${winner5.textContent}</button>`;
-      }
     }
   </script>
 </body>
